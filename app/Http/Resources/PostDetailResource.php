@@ -20,8 +20,8 @@ class PostDetailResource extends JsonResource
             'news_content' => $this->news_content,
             'created_at' => $this->created_at,
             'author' => $this->author,
-            // 'writer' => $this->whenLoaded('writer')
-            'writer' => $this->writer
+            'writer' => $this->whenLoaded('writer')
+            // 'writer' => $this->writer
         ];
     }
 }

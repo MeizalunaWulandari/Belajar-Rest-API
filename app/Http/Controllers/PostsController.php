@@ -11,22 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PostsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $posts = Post::all();
 
-        // $data = [
-        //     'message' => 'success',
-        //     'data' => $posts
-        // ];
-        // return response()->json($data, response::HTTP_OK);
-
-        return PostDetailResource::collection($posts->loadMissing('writer:id,username'));
+        return PostDetailResource::collection($posts->loadMissing(['writer:id,username', 'comments:id,post_id,user_id,comments_content']));
 
     }
 
@@ -34,16 +23,9 @@ class PostsController extends Controller
     {
         // NOTE : findOrFail harus diakhir
         $post = Post::with('writer:id,username')->findOrFail($id);
-        return new PostDetailResource($post);
-        // return response()->json($post, response::HTTP_OK);
+        return new PostDetailResource($post->loadMissing(['writer:id,username', 'comments:id,post_id,user_id,comments_content']));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -56,13 +38,6 @@ class PostsController extends Controller
         return new PostDetailResource($post->loadMissing('writer:id,username'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
          $validatedData = $request->validate([
@@ -75,12 +50,6 @@ class PostsController extends Controller
          return new PostDetailResource($post->loadMissing('writer:id,username'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $post = Post::findOrFail($id);

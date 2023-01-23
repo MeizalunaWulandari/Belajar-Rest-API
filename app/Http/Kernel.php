@@ -64,5 +64,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'PemilikPostingan' => \App\Http\Middleware\PemilikPostingan::class,
+        'PemilikKomentar' => \App\Http\Middleware\PemilikKomentar::class,
     ];
 }

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Http\Resources\PostResource;
-use App\Http\Resources\PostDetailResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\PostDetailResource;
 use Symfony\Component\HttpFoundation\Response;
 
 class PostsController extends Controller
@@ -28,14 +29,22 @@ class PostsController extends Controller
 
     public function store(Request $request)
     {
+        // return $request->file;
+
         $validatedData = $request->validate([
             'title' => ['required', 'max:200'],
+            'image' => 'image|file|max:1024',
             'news_content' => ['required']
         ]);
-        $request['author'] = Auth::user()->id;
-        $post = Post::create($request->all());
 
-        return new PostDetailResource($post->loadMissing('writer:id,username'));
+        if ($request->file('image')) {
+            $validatedData['image'] = $request->file('image')->store('post-images');
+        }
+
+        $validatedData['author'] = Auth::user()->id;
+        $post = Post::create($validatedData);
+
+        return new PostDetailResource($post->loadMissing(['writer:id,username', 'comments:id,post_id,user_id,comments_content']));
     }
 
     public function update(Request $request, $id)
